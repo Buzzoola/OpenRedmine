@@ -1,5 +1,7 @@
 package jp.redmine.redmineclient.parser;
 
+import android.util.Log;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -7,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.redmine.redmineclient.BuildConfig;
 import jp.redmine.redmineclient.entity.RedmineAttachment;
 import jp.redmine.redmineclient.entity.RedmineConnection;
 import jp.redmine.redmineclient.entity.RedmineIssue;
@@ -181,6 +184,29 @@ public class ParserIssue extends BaseParserInternal<RedmineConnection,RedmineIss
 			item.setCreated(TypeConverter.parseDateTime(getNextText()));
 		} else if("updated_on".equalsIgnoreCase(xml.getName())){
 			item.setModified(TypeConverter.parseDateTime(getNextText()));
+		} else if ("custom_field".equalsIgnoreCase(xml.getName())){
+
+			int id = getAttributeInteger("id");
+			String name = getAttributeString("name");
+
+			if(BuildConfig.DEBUG) Log.d("ParserIssue", String.format("CUSTOM_FIELD id=%d name=%s", id, name));
+
+//			switch (id){
+//				case 1:
+//					int value = getAttributeInteger("value");
+//					int multiple = getAttributeInteger("multiple");
+//					break;
+//
+//				case 2:
+//					String valueStr = getAttributeString("value");
+//					break;
+//
+//				default:
+//
+//
+//			}
+
+
 		}
 		// TODO changesets
 

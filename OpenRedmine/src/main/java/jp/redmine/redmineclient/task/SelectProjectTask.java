@@ -16,6 +16,7 @@ import jp.redmine.redmineclient.db.cache.RedmineTimeActivityModel;
 import jp.redmine.redmineclient.db.cache.RedmineTrackerModel;
 import jp.redmine.redmineclient.db.cache.RedmineUserModel;
 import jp.redmine.redmineclient.entity.RedmineConnection;
+import jp.redmine.redmineclient.entity.RedmineCustomField;
 import jp.redmine.redmineclient.entity.RedminePriority;
 import jp.redmine.redmineclient.entity.RedmineProject;
 import jp.redmine.redmineclient.entity.RedmineStatus;
@@ -23,12 +24,14 @@ import jp.redmine.redmineclient.entity.RedmineTimeActivity;
 import jp.redmine.redmineclient.entity.RedmineTracker;
 import jp.redmine.redmineclient.entity.RedmineUser;
 import jp.redmine.redmineclient.parser.DataCreationHandler;
+import jp.redmine.redmineclient.parser.ParserCustomFields;
 import jp.redmine.redmineclient.parser.ParserEnumerationIssuePriority;
 import jp.redmine.redmineclient.parser.ParserEnumerationTimeEntryActivity;
 import jp.redmine.redmineclient.parser.ParserProject;
 import jp.redmine.redmineclient.parser.ParserStatus;
 import jp.redmine.redmineclient.parser.ParserTracker;
 import jp.redmine.redmineclient.parser.ParserUser;
+import jp.redmine.redmineclient.url.RemoteUrlCustomFields;
 import jp.redmine.redmineclient.url.RemoteUrlEnumerations;
 import jp.redmine.redmineclient.url.RemoteUrlEnumerations.EnumerationType;
 import jp.redmine.redmineclient.url.RemoteUrlProjects;
@@ -60,6 +63,7 @@ public class SelectProjectTask extends SelectDataTask<Void,RedmineConnection> {
 			fetchTracker(connection,client);
 			fetchPriority(connection,client);
 			fetchTimeEntryActivity(connection,client);
+			fetchCusomFields(connection, client);
 			do {
 				List<RedmineProject> projects = fetchProject(connection,client,offset,limit);
 				count = projects.size();
@@ -218,6 +222,19 @@ public class SelectProjectTask extends SelectDataTask<Void,RedmineConnection> {
 						model.refreshCurrentUser(con,data);
 					}
 				});
+				helperSetupParserStream(stream,parser);
+				parser.parse(connection);
+			}
+		});
+	}
+	protected void fetchCusomFields(final RedmineConnection connection, SelectDataTaskRedmineConnectionHandler client){
+		RemoteUrlCustomFields url = new RemoteUrlCustomFields();
+
+		fetchData(client, url, new SelectDataTaskDataHandler() {
+			@Override
+			public void onContent(InputStream stream)
+					throws XmlPullParserException, IOException, SQLException {
+				ParserCustomFields parser = new ParserCustomFields();
 				helperSetupParserStream(stream,parser);
 				parser.parse(connection);
 			}

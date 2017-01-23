@@ -66,6 +66,10 @@ public class TypeConverter {
 		Integer ret = parseInteger(str);
 		return ret == null ? default_value : ret;
 	}
+	public static boolean parseBoolean(String str){
+		if(TextUtils.isEmpty(str)) return false;
+		return new Boolean(str);
+	}
 	@SuppressLint("SimpleDateFormat")
 	public static String getDateString(Date date){
 		SimpleDateFormat format = new SimpleDateFormat();
