@@ -114,12 +114,8 @@ public class RedmineIssueModel {
 		builder.selectRaw(RedmineIssue.ID);
 		GenericRawResults<String[]> result = builder.queryRaw();
 		String[] values = result.getFirstResult();
+		result.close();
 
-		try {
-			result.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		return (values != null && values[0] != null) ? Long.parseLong(values[0]) : null;
 	}
 	

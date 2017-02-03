@@ -4,7 +4,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import jp.redmine.redmineclient.R;
+import jp.redmine.redmineclient.entity.RedmineCustomField;
 import jp.redmine.redmineclient.entity.RedmineIssue;
 import jp.redmine.redmineclient.form.helper.FormHelper;
 
@@ -17,6 +20,8 @@ abstract class IssueBaseForm extends FormHelper {
 	public TextView textDateTo;
 	public TextView textVersion;
 	public TextView textModified;
+	public TextView textTag;
+	public TextView textBranchName;
 	public ProgressBar progressBar;
 	public IssueBaseForm(View activity){
 		this.setup(activity);
@@ -33,6 +38,8 @@ abstract class IssueBaseForm extends FormHelper {
 		textDateTo = (TextView)view.findViewById(R.id.textDateTo);
 		textVersion = (TextView)view.findViewById(R.id.textVersion);
 		textModified = (TextView)view.findViewById(R.id.textModified);
+		textTag = (TextView)view.findViewById(R.id.textTag);
+		textBranchName = (TextView)view.findViewById(R.id.textBranchName);
 	}
 
 

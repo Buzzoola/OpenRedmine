@@ -2,6 +2,7 @@ package jp.redmine.redmineclient.entity;
 
 import android.text.TextUtils;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -12,6 +13,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import jp.redmine.redmineclient.model.CustomFieldsModel;
+import jp.redmine.redmineclient.model.IssueCustomField;
 
 @DatabaseTable
 public class RedmineIssue
@@ -604,6 +608,7 @@ public class RedmineIssue
 		this.watchers = watchers;
 	}
 
+
 	@Override
 	public Element getXml(Document document) {
 		Element root = document.createElement("issue");
@@ -636,6 +641,45 @@ public class RedmineIssue
 		if( journal != null && !TextUtils.isEmpty(journal.getNotes()) ){
 			root.appendChild(getElement(document,"notes",		journal.getNotes()));
 		}
+
+		Element customFields = document.createElement("custom_fields");
+		customFields.setAttribute("type", "array");
+
+		Integer tempIssueId = getIssueId();
+		if(tempIssueId == null){
+			tempIssueId = -1;
+		}
+
+		List<IssueCustomField> issuesCustomFields = CustomFieldsModel.getInstance().getListByIssueId(tempIssueId);
+		for( IssueCustomField customFieldItem : issuesCustomFields) {
+
+			Element customField = document.createElement("custom_field");
+			customField.setAttribute("id", ""+customFieldItem.getCustomFieldId());
+			customField.setAttribute("name", ""+customFieldItem.getName());
+			if (customFieldItem.getName().equalsIgnoreCase("tag")) {
+				customField.setAttribute("multiple", "true");
+
+				Element customFieldValues = document.createElement("value");
+				customFieldValues.setAttribute("type", "array");
+
+				for (String valueItem : customFieldItem.getValues()) {
+					customFieldValues.appendChild(getElement(document, "value", valueItem));
+				}
+
+				customField.appendChild(customFieldValues);
+			} else if (customFieldItem.getName().equalsIgnoreCase("branch name")) {
+
+				ArrayList<String> values = customFieldItem.getValues();
+				if (values != null && values.size() > 0) {
+					customField.appendChild(getElement(document, "value", values.get(0)));
+				}
+			}
+
+			customFields.appendChild(customField);
+		}
+
+		root.appendChild(customFields);
+
 		return root;
 	}
 

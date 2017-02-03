@@ -165,6 +165,7 @@ public class Fetcher {
 			switch (response) {
 				case HttpURLConnection.HTTP_ACCEPTED:
 				case HttpURLConnection.HTTP_OK:
+				case HttpURLConnection.HTTP_CREATED:
 					InputStream stream = con.getInputStream();
 					String encoding = con.getContentEncoding();
 					if(encoding == null) {

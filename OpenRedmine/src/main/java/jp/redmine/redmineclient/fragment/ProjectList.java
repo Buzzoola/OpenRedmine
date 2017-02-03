@@ -121,6 +121,9 @@ public class ProjectList extends OrmLiteListFragment<DatabaseCacheHelper> implem
 				= ListFragmentSwipeRefreshLayout.inject(container, view);
 		mSwipeRefreshLayout = result.layout;
 		mSwipeRefreshLayout.setOnRefreshListener(this);
+
+		startRefresh();
+
 		return result.parent;
 	}
 
@@ -145,6 +148,10 @@ public class ProjectList extends OrmLiteListFragment<DatabaseCacheHelper> implem
 		if(task != null && task.getStatus() == Status.RUNNING){
 			return;
 		}
+		startRefresh();
+	}
+
+	private void startRefresh() {
 		ConnectionArgument intent = new ConnectionArgument();
 		intent.setArgument(getArguments());
 		int id = intent.getConnectionId();

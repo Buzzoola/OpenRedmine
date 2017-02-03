@@ -1,13 +1,17 @@
 package jp.redmine.redmineclient.fragment.form;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import com.andreabaccega.widget.FormEditText;
 
+import jp.redmine.redmineclient.MultiSpinner;
 import jp.redmine.redmineclient.R;
 import jp.redmine.redmineclient.adapter.FilterListAdapter;
 import jp.redmine.redmineclient.db.cache.DatabaseCacheHelper;
 import jp.redmine.redmineclient.db.cache.RedmineCategoryModel;
+import jp.redmine.redmineclient.db.cache.RedmineCustomFieldModel;
 import jp.redmine.redmineclient.db.cache.RedminePriorityModel;
 import jp.redmine.redmineclient.db.cache.RedmineStatusModel;
 import jp.redmine.redmineclient.db.cache.RedmineTrackerModel;
@@ -25,6 +29,8 @@ import jp.redmine.redmineclient.entity.RedmineTracker;
 import jp.redmine.redmineclient.entity.RedmineUser;
 import jp.redmine.redmineclient.entity.TypeConverter;
 import jp.redmine.redmineclient.form.helper.FormHelper;
+import jp.redmine.redmineclient.model.CustomFieldsModel;
+
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -34,6 +40,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -50,6 +57,7 @@ public class IssueEditForm extends FormHelper {
 	public Spinner spinnerPriority;
 	public Spinner spinnerVersion;
 	public Spinner spinnerAssigned;
+	public MultiSpinner spinnerTags;
 	public SeekBar progressIssue;
 
 	public FormEditText textTitle;
@@ -57,6 +65,7 @@ public class IssueEditForm extends FormHelper {
 	public FormEditText textComment;
 	public FormEditText textDateStart;
 	public FormEditText textDateDue;
+	public EditText textBranchName;
 	public ImageButton imageCalendarStart;
 	public ImageButton imageCalendarDue;
 	public FormEditText textTime;
@@ -74,6 +83,7 @@ public class IssueEditForm extends FormHelper {
 	protected FilterListAdapter adapterPriority;
 	protected FilterListAdapter adapterUser;
 	protected FilterListAdapter adapterVersion;
+
 	public IssueEditForm(View activity){
 		this.setup(activity);
 		this.setupEvents();
@@ -87,6 +97,7 @@ public class IssueEditForm extends FormHelper {
 		spinnerPriority = (Spinner)view.findViewById(R.id.spinnerPriority);
 		spinnerVersion = (Spinner)view.findViewById(R.id.spinnerVersion);
 		spinnerAssigned = (Spinner)view.findViewById(R.id.spinnerAssigned);
+		spinnerTags = (MultiSpinner)view.findViewById(R.id.spinnerTags);
 		progressIssue = (SeekBar)view.findViewById(R.id.progressIssue);
 
 		textTitle = (FormEditText)view.findViewById(R.id.textTitle);
@@ -94,6 +105,7 @@ public class IssueEditForm extends FormHelper {
 		textComment = (FormEditText)view.findViewById(R.id.textComment);
 		textDateStart = (FormEditText)view.findViewById(R.id.textDateStart);
 		textDateDue = (FormEditText)view.findViewById(R.id.textDateDue);
+		textBranchName = (EditText)view.findViewById(R.id.textBranchName);
 		imageCalendarStart = (ImageButton)view.findViewById(R.id.imageCalendarStart);
 		imageCalendarDue = (ImageButton)view.findViewById(R.id.imageCalendarDue);
 		textTime = (FormEditText)view.findViewById(R.id.textTime);
@@ -168,6 +180,7 @@ public class IssueEditForm extends FormHelper {
 		adapterPriority = new FilterListAdapter(new RedminePriorityModel(helper));
 		adapterUser = new FilterListAdapter(new RedmineUserModel(helper));
 		adapterVersion = new FilterListAdapter(new RedmineVersionModel(helper));
+
 	}
 
 	public void setupParameter(int connection, long project){
@@ -203,6 +216,7 @@ public class IssueEditForm extends FormHelper {
 		setSpinnerItem(spinnerPriority,adapterPriority,data.getPriority());
 		setSpinnerItem(spinnerAssigned,adapterUser,data.getAssigned());
 		setSpinnerItem(spinnerVersion,adapterVersion,data.getVersion());
+		setSpinnerItem(spinnerTags,adapterVersion,data.getVersion());
 
 		progressIssue.setProgress(data.getProgressRate() == null ? 0 : data.getProgressRate());
 		textCreated.setVisibility(data.getCreated() == null ? View.GONE : View.VISIBLE);
@@ -211,6 +225,40 @@ public class IssueEditForm extends FormHelper {
 		setDateTime(textCreated, data.getCreated());
 		setDateTime(textModified, data.getModified());
 
+		//Branch name
+		if (data.getIssueId() != null) {
+			List<String> currentValues = CustomFieldsModel.getInstance().get(data.getIssueId(), "branch name").getValues();
+			if (currentValues != null && currentValues.size() > 0) {
+				textBranchName.setText(currentValues.get(0));
+			}
+		}
+
+		//Tags
+		List<String> items = CustomFieldsModel.getInstance().getTagValues();
+
+		List<Integer> currentIntValues = null;
+
+		if (data.getIssueId() != null) {
+			List<String> currentValues = CustomFieldsModel.getInstance().get(data.getIssueId(), "tag").getValues();
+			currentIntValues = convertFromStringList(currentValues);
+		}
+
+
+		spinnerTags.setItems(items, currentIntValues, new MultiSpinner.MultiSpinnerListener() {
+			@Override
+			public void onItemsSelected(boolean[] selected) {
+
+			}
+		});
+
+	}
+
+	private List<Integer> convertFromStringList(List<String> strings) {
+		List<Integer> returnValue = new ArrayList<>();
+		for(String item : strings) {
+			returnValue.add(Integer.parseInt(item)-1);
+		}
+		return returnValue;
 	}
 
 	protected void setSpinnerItem(Spinner spinner, FilterListAdapter adapter, IMasterRecord record){
@@ -220,9 +268,11 @@ public class IssueEditForm extends FormHelper {
 			for(int i = 0; i < adapter.getCount(); i++){
 				@SuppressWarnings("deprecation")
 				IMasterRecord activity = (IMasterRecord) adapter.getItem(i);
-				if(activity.getId() == record.getId()){
-					spinner.setSelection(i);
-					break;
+				if (activity != null && record != null) {
+					if (activity.getId() == record.getId()) {
+						spinner.setSelection(i);
+						break;
+					}
 				}
 			}
 		}
@@ -260,6 +310,16 @@ public class IssueEditForm extends FormHelper {
 			}
 			journal.setNotes(textComment.getText().toString());
 		}
+
+		Integer tempIssueId = data.getIssueId();
+		if (tempIssueId == null) {
+			tempIssueId = -1;
+			CustomFieldsModel.getInstance().createCustomFieldsIfNeed(tempIssueId);
+		}
+
+		CustomFieldsModel.getInstance().putTagList(tempIssueId, spinnerTags.getSelectedIdx());
+		CustomFieldsModel.getInstance().setBranchName(tempIssueId, textBranchName.getText().toString());
+
 	}
 
 	@Override
@@ -292,6 +352,9 @@ public class IssueEditForm extends FormHelper {
 				, textTime
 				))
 			valid = false;
+
+		//TODO check tags and branch name
+
 
 		return valid;
 	}

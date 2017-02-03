@@ -4,6 +4,8 @@ import com.j256.ormlite.field.DatabaseField;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Created by SSvistunov on 18.01.17.
@@ -62,7 +64,27 @@ public class RedmineCustomField implements IConnectionRecord
 	@DatabaseField
 	private boolean visible;
 	@DatabaseField
-	private ArrayList<String> possible_values;
+	private Date created;
+	@DatabaseField
+	private Date modified;
+
+	private TreeMap<Integer, String> possible_values;
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public Date getModified() {
+		return modified;
+	}
+
+	public void setModified(Date modified) {
+		this.modified = modified;
+	}
 
 	@Override
 	public String toString(){
@@ -187,12 +209,22 @@ public class RedmineCustomField implements IConnectionRecord
 		this.visible = visible;
 	}
 
-	public ArrayList<String> getPossibleValues() {
+	public TreeMap<Integer, String> getPossibleValues() {
 		return possible_values;
 	}
 
-	public void setPossibleValues(ArrayList<String> possible_values) {
-		this.possible_values = possible_values;
+
+	public void addPossibleValue(int idx, String value) {
+		if (this.possible_values == null) {
+			this.possible_values = new TreeMap<>();
+		}
+
+		this.possible_values.put(idx, value);
+	}
+
+	public String getPossibleValue(int idx) {
+		if (possible_values == null) return null;
+		return possible_values.get(idx);
 	}
 
 	@Override

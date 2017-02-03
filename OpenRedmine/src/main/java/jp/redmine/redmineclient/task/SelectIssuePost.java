@@ -2,6 +2,7 @@ package jp.redmine.redmineclient.task;
 
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import jp.redmine.redmineclient.db.cache.DatabaseCacheHelper;
 import jp.redmine.redmineclient.db.cache.RedmineIssueModel;
 import jp.redmine.redmineclient.entity.RedmineConnection;
 import jp.redmine.redmineclient.entity.RedmineIssue;
+import jp.redmine.redmineclient.events.CloseActivityAfterAddNewIssueEvent;
 import jp.redmine.redmineclient.parser.DataCreationHandler;
 import jp.redmine.redmineclient.parser.IssueModelDataCreationHandler;
 import jp.redmine.redmineclient.parser.ParserIssue;
@@ -46,6 +48,7 @@ public class SelectIssuePost extends SelectDataPost<List<RedmineIssue>,RedmineIs
 					@Override
 					public void onData(RedmineConnection info, RedmineIssue data) throws SQLException {
 						list.add(data);
+						EventBus.getDefault().post(new CloseActivityAfterAddNewIssueEvent());
 					}
 				});
 

@@ -13,6 +13,10 @@ import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OrmLiteFragment;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.sql.SQLException;
 import java.util.List;
 
@@ -25,9 +29,11 @@ import jp.redmine.redmineclient.db.cache.RedmineProjectModel;
 import jp.redmine.redmineclient.entity.RedmineConnection;
 import jp.redmine.redmineclient.entity.RedmineIssue;
 import jp.redmine.redmineclient.entity.RedmineProject;
+import jp.redmine.redmineclient.events.CloseActivityAfterAddNewIssueEvent;
 import jp.redmine.redmineclient.fragment.form.IssueEditForm;
 import jp.redmine.redmineclient.fragment.helper.ActivityHandler;
 import jp.redmine.redmineclient.model.ConnectionModel;
+import jp.redmine.redmineclient.model.CustomFieldsModel;
 import jp.redmine.redmineclient.param.IssueArgument;
 import jp.redmine.redmineclient.task.SelectIssuePost;
 
@@ -71,6 +77,7 @@ public class IssueEdit extends OrmLiteFragment<DatabaseCacheHelper> {
 		form = new IssueEditForm(getView());
 		form.setupDatabase(getHelper());
 	}
+
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -146,6 +153,9 @@ public class IssueEdit extends OrmLiteFragment<DatabaseCacheHelper> {
 						issue.setProject(project);
 				}
 				form.getValue(issue);
+
+				final RedmineIssue finalIssue = issue;
+
 				SelectIssuePost post = new SelectIssuePost(getHelper(), connection){
 					private boolean isSuccess = true;
 					@Override
@@ -163,6 +173,10 @@ public class IssueEdit extends OrmLiteFragment<DatabaseCacheHelper> {
 					@Override
 					protected void onPostExecute(List<RedmineIssue> result) {
 						super.onPostExecute(result);
+
+						if (finalIssue.getIssueId() == null)
+							CustomFieldsModel.getInstance().clearForIssue(-1);
+
 						if(mSwipeRefreshLayout != null) {
 							mSwipeRefreshLayout.setRefreshing(false);
 							mSwipeRefreshLayout.setEnabled(false);

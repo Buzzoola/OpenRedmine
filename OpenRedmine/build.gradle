@@ -52,15 +52,20 @@ android {
 dependencies {
     androidTestCompile 'com.google.guava:guava:21.0'
     androidTestCompile 'junit:junit:4.12'
-    compile 'com.android.support:support-v4:25.1.0'
-    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:support-v4:25.1.1'
+    compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.andreabaccega:android-form-edittext:1.2.1'
     compile 'se.emilsjolander:stickylistheaders:2.7.0'
-    compile 'com.j256.ormlite:ormlite-core:5.0'
-    compile 'com.j256.ormlite:ormlite-android:5.0'
+
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'net.java:textile-j:2.2'
     compile 'org.commonjava.googlecode.markdown4j:markdown4j:2.2-cj-1.0'
+
+    compile 'org.greenrobot:eventbus:3.0.0'
+
+    //Don't update it, version 5 has stupid bugs
+    compile 'com.j256.ormlite:ormlite-core:4.48'
+    compile 'com.j256.ormlite:ormlite-android:4.48'
 }
 
 if (project.hasProperty('keyAlias')) {

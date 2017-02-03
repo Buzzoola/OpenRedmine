@@ -58,6 +58,8 @@
   <string name="ticket_date_closed">Закрыта</string>
   <string name="ticket_modified">Обновлена</string>
   <string name="ticket_modified_by">%2$s</string>
+  <string name="ticket_tag">Тэги</string>
+  <string name="ticket_tag_value">Значение тэга</string>
   <string name="ticket_time">Время</string>
   <string name="ticket_time_estimate">%.2f</string>
   <string name="ticket_activity">Действия</string>

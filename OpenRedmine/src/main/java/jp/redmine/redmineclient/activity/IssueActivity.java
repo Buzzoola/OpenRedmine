@@ -5,6 +5,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,6 +23,7 @@ import jp.redmine.redmineclient.db.cache.RedmineIssueModel;
 import jp.redmine.redmineclient.db.cache.RedmineProjectModel;
 import jp.redmine.redmineclient.entity.RedmineIssue;
 import jp.redmine.redmineclient.entity.RedmineProject;
+import jp.redmine.redmineclient.events.CloseActivityAfterAddNewIssueEvent;
 import jp.redmine.redmineclient.fragment.ActivityInterface;
 import jp.redmine.redmineclient.fragment.IssueEdit;
 import jp.redmine.redmineclient.fragment.IssueView;
@@ -137,6 +143,29 @@ public class IssueActivity extends TabActivity<DatabaseCacheHelper>
 
 		return list;
 	}
+
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onMessageEvent(CloseActivityAfterAddNewIssueEvent event) {
+		//Toast.makeText(this, "Close event", Toast.LENGTH_SHORT).show();
+		//Close activity
+		finish();
+	}
+
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		EventBus.getDefault().register(this);
+	}
+
+
+	@Override
+	public void onStop() {
+		EventBus.getDefault().unregister(this);
+		super.onStop();
+	}
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

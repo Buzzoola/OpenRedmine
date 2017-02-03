@@ -13,8 +13,8 @@ import jp.redmine.redmineclient.entity.IMasterRecord;
 import jp.redmine.redmineclient.entity.TypeConverter;
 
 abstract public class BaseParserInternal<CON,ITEM> extends BaseParser<CON,ITEM> {
-	private ITEM item = null;
-	private int lastdepth;
+	protected ITEM item = null;
+	protected int lastdepth;
 
 	abstract protected String getProveTagName();
 	abstract protected ITEM getNewProveTagItem();
@@ -26,6 +26,15 @@ abstract public class BaseParserInternal<CON,ITEM> extends BaseParser<CON,ITEM> 
 		item = null;
 		lastdepth = 0;
 	}
+
+	@Override
+	protected void onText(CON con) throws XmlPullParserException, IOException, SQLException {
+		super.onText(con);
+		if(item != null){
+			parseInternal(con,item);
+		}
+	}
+
 	@Override
 	protected void onTagStart(CON con)
 			throws XmlPullParserException, IOException, SQLException {
@@ -65,6 +74,13 @@ abstract public class BaseParserInternal<CON,ITEM> extends BaseParser<CON,ITEM> 
 		return TypeConverter.parseInteger(id);
 	}
 
+	protected boolean getAttributeBoolean(String attr){
+		return getAttributeBoolean("",attr);
+	}
+	protected boolean getAttributeBoolean(String schema, String attr){
+		String id = xml.getAttributeValue(schema, attr);
+		return TypeConverter.parseBoolean(id);
+	}
 
 	protected Long getAttributeLong(String attr){
 		return getAttributeLong("",attr);

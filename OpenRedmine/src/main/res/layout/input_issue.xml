@@ -311,6 +311,38 @@
 
 
 			</TableRow>
+			<TableRow
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" >
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/ticket_tag" />
+
+				<jp.redmine.redmineclient.MultiSpinner
+					android:id="@+id/spinnerTags"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content" />
+
+			</TableRow>
+			<TableRow
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" >
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Branch name" />
+
+				<EditText
+					android:id="@+id/textBranchName"
+					android:layout_width="120dp"
+					android:layout_height="wrap_content"
+					android:text=""/>
+
+			</TableRow>
+
 		</TableLayout>
 
 		<TextView

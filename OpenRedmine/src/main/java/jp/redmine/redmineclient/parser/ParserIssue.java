@@ -12,6 +12,7 @@ import java.util.List;
 import jp.redmine.redmineclient.BuildConfig;
 import jp.redmine.redmineclient.entity.RedmineAttachment;
 import jp.redmine.redmineclient.entity.RedmineConnection;
+import jp.redmine.redmineclient.entity.RedmineCustomField;
 import jp.redmine.redmineclient.entity.RedmineIssue;
 import jp.redmine.redmineclient.entity.RedmineIssueRelation;
 import jp.redmine.redmineclient.entity.RedmineIssueRelation.RelationType;
@@ -25,12 +26,17 @@ import jp.redmine.redmineclient.entity.RedmineTracker;
 import jp.redmine.redmineclient.entity.RedmineUser;
 import jp.redmine.redmineclient.entity.RedmineWatcher;
 import jp.redmine.redmineclient.entity.TypeConverter;
+import jp.redmine.redmineclient.model.CustomFieldsModel;
+import jp.redmine.redmineclient.model.IssueCustomField;
 
 public class ParserIssue extends BaseParserInternal<RedmineConnection,RedmineIssue> {
 	private static final String TAG = ParserIssue.class.getSimpleName();
 	private ParserJournals parserJournal = new ParserJournals();
 	private ParserAttachment parserAttachment = new ParserAttachment();
 	private ParserWatchers parserWatcher = new ParserWatchers();
+
+	private IssueCustomField field;
+
 	@Override
 	protected String getProveTagName() {
 		return "issue";
@@ -50,6 +56,9 @@ public class ParserIssue extends BaseParserInternal<RedmineConnection,RedmineIss
 			String work = getNextText();
 			if("".equals(work))	return;
 			item.setIssueId(TypeConverter.parseInteger(work));
+			//clear custom fields for this issue
+			CustomFieldsModel.getInstance().clearForIssue(item.getIssueId());
+
 		} else if("subject".equalsIgnoreCase(xml.getName())){
 			item.setSubject(getNextText());
 		} else if("description".equalsIgnoreCase(xml.getName())){
@@ -188,29 +197,35 @@ public class ParserIssue extends BaseParserInternal<RedmineConnection,RedmineIss
 
 			int id = getAttributeInteger("id");
 			String name = getAttributeString("name");
+			boolean multiple = getAttributeBoolean("multiple");
+			String type = getAttributeString("type");
 
+			field = new IssueCustomField(id, name);
+
+			if(BuildConfig.DEBUG) Log.d("ParserIssue", String.format("CUSTOM_FIELD id=%d name=%s a", id, name));
 			if(BuildConfig.DEBUG) Log.d("ParserIssue", String.format("CUSTOM_FIELD id=%d name=%s", id, name));
 
-//			switch (id){
-//				case 1:
-//					int value = getAttributeInteger("value");
-//					int multiple = getAttributeInteger("multiple");
-//					break;
-//
-//				case 2:
-//					String valueStr = getAttributeString("value");
-//					break;
-//
-//				default:
-//
-//
-//			}
-
-
+		} else if(xml.getName() == null || "value".equalsIgnoreCase(xml.getName())){
+			String work = xml.getText();
+			if (work != null && !work.isEmpty() && field != null) {
+				field.addValue(work);
+			}
 		}
+
 		// TODO changesets
 
 	}
 
+	@Override
+	protected void onTagEnd(RedmineConnection con)
+			throws XmlPullParserException, IOException,SQLException {
+
+		if(equalsTagName("custom_field")){
+			CustomFieldsModel.getInstance().add(item.getIssueId(), field);
+			field = null;
+		}
+
+		super.onTagEnd(con);
+	}
 
 }

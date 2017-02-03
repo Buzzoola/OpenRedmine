@@ -23,6 +23,7 @@ import jp.redmine.redmineclient.entity.RedmineStatus;
 import jp.redmine.redmineclient.entity.RedmineTimeActivity;
 import jp.redmine.redmineclient.entity.RedmineTracker;
 import jp.redmine.redmineclient.entity.RedmineUser;
+import jp.redmine.redmineclient.model.CustomFieldsModel;
 import jp.redmine.redmineclient.parser.DataCreationHandler;
 import jp.redmine.redmineclient.parser.ParserCustomFields;
 import jp.redmine.redmineclient.parser.ParserEnumerationIssuePriority;
@@ -234,6 +235,7 @@ public class SelectProjectTask extends SelectDataTask<Void,RedmineConnection> {
 			@Override
 			public void onContent(InputStream stream)
 					throws XmlPullParserException, IOException, SQLException {
+				CustomFieldsModel.getInstance().clearDescription();
 				ParserCustomFields parser = new ParserCustomFields();
 				helperSetupParserStream(stream,parser);
 				parser.parse(connection);

@@ -174,5 +174,18 @@ public class ConnectionForm extends FormHelper {
 		rd.setPermitUnsafe(checkUnsafeConnection.isChecked());
 		rd.setCertKey(editCertKey.getText().toString());
 	}
+
+	public void initBuzzoolaDefaults() {
+		editName.setText("BuzzoolaRedmine");
+		editUrl.setText("https://redmine.buzzoola.com");
+		editToken.setHint("Это не нужно");
+		checkHttpAuth.setChecked(true);
+		editAuthID.setHint("Логин");
+		editAuthPasswd.setHint("Пароль");
+		checkUnsafeConnection.setChecked(true);
+		editCertKey.setHint("Это не нужно");
+
+		editAuthID.requestFocus();
+	}
 }
 

@@ -124,5 +124,7 @@
 	<string name="recent_issues">Resent issues</string>
 	<string name="web">Web</string>
 	<string name="contributors">Contributors</string>
+	<string name="ticket_tag">Tags</string>
+	<string name="ticket_tag_value">Tag value</string>
 
 </resources>

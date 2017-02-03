@@ -4,14 +4,18 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 
 import jp.redmine.redmineclient.R;
 import jp.redmine.redmineclient.activity.handler.WebviewActionInterface;
 import jp.redmine.redmineclient.entity.IMasterRecord;
+import jp.redmine.redmineclient.entity.RedmineCustomField;
 import jp.redmine.redmineclient.entity.RedmineIssue;
 import jp.redmine.redmineclient.entity.RedmineUser;
 import jp.redmine.redmineclient.form.helper.TextViewHelper;
+import jp.redmine.redmineclient.model.CustomFieldsModel;
+import jp.redmine.redmineclient.model.IssueCustomField;
 
 public class IssueDetailForm extends IssueBaseForm {
 	public TextView textProject;
@@ -82,6 +86,36 @@ public class IssueDetailForm extends IssueBaseForm {
 		setVisible(rd.getEstimatedHours() != 0, labelTime, textTimeEstimate, labelTimeSlice);
 		setMasterName(textProject, rd.getProject());
 
+
+		IssueCustomField tag = CustomFieldsModel.getInstance().get(rd.getIssueId(), "Tag");
+		if (tag != null) {
+			ArrayList<String> tagValues = tag.getValues();
+			StringBuffer sb = new StringBuffer();
+			for (String value : tagValues) {
+
+				int idx = Integer.parseInt(value);
+				RedmineCustomField description = tag.getDescription();
+				if (description != null) {
+					String possibleValue = description.getPossibleValue(idx);
+					if (possibleValue != null) {
+						sb.append(possibleValue + " ");
+					}
+				}
+			}
+
+			textTag.setText(sb.toString().trim());
+		}
+
+		IssueCustomField branch = CustomFieldsModel.getInstance().get(rd.getIssueId(), "branch name");
+		if (branch != null) {
+			ArrayList<String> branchValues = branch.getValues();
+			if (branchValues != null && branchValues.size() > 0) {
+				String value = branchValues.get(0);
+				textBranchName.setText(value);
+			}
+			else
+				textBranchName.setText("");
+		}
 
 	}
 	protected void setVisible(IMasterRecord record, View ... views){

@@ -65,6 +65,7 @@ public class ConnectionEdit extends OrmLiteFragment<DatabaseCacheHelper> {
 
 		form = new ConnectionForm(getView());
 		form.setupEvents();
+		form.initBuzzoolaDefaults();
 
 		form.buttonSave.setOnClickListener(new Button.OnClickListener() {
 			public void onClick(View view) {
